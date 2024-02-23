@@ -60,6 +60,12 @@ public class VisaController : ControllerBase
         }
     }
 
+    [HttpGet("test")]
+    public async Task<IActionResult> GetTest()
+    {
+        return Ok($"USERNAME = {USERNAME} - PASSWORD = {PASSWORD}");
+    }
+
     private async Task<StatusCodeResult> DoAll(IPage page)
     {
 
