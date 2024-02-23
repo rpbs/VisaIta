@@ -1,0 +1,6 @@
+@VisaIta_HostAddress = http://localhost:5110
+
+GET {{VisaIta_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
