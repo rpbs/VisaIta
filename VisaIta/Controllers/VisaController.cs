@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Playwright;
 
 namespace VisaIta.Controllers;
@@ -10,9 +8,9 @@ namespace VisaIta.Controllers;
 public class VisaController : ControllerBase
 {
 
-    const string MAIN_URL = "https://prenotami.esteri.it/Home?ReturnUrl=%2fServices";
-    const string BOOKING_PAGE = "https://prenotami.esteri.it/Services/Booking/4689";
-    const int WAIT_SERVER_TIME = 30000;
+    readonly string MAIN_URL;
+    readonly string BOOKING_PAGE;
+    
     private const bool HIDE_BROWNSER = true;
 
     private readonly ILogger _logger;
@@ -39,6 +37,8 @@ public class VisaController : ControllerBase
 
         USERNAME = configuration.GetSection("Main").GetValue<string>("USERNAME"); 
         PASSWORD = configuration.GetSection("Main").GetValue<string>("PASSWORD");
+        MAIN_URL = configuration.GetSection("Main").GetValue<string>("MAIN_URL");
+        BOOKING_PAGE = configuration.GetSection("Main").GetValue<string>("BOOKING_PAGE");
     }
 
     [HttpGet]
@@ -61,9 +61,15 @@ public class VisaController : ControllerBase
     }
 
     [HttpGet("test")]
-    public async Task<IActionResult> GetTest()
+    public IActionResult GetTest()
     {
-        return Ok($"USERNAME = {USERNAME} - PASSWORD = {PASSWORD}");
+        var msg = $"""
+            USERNAME = {USERNAME}
+            PASSWORD = {PASSWORD} 
+            MAIN_URL = {MAIN_URL}
+            BOOKING_PAGE = {BOOKING_PAGE}
+            """;
+        return Ok(msg);
     }
 
     private async Task<StatusCodeResult> DoAll(IPage page)
@@ -78,7 +84,7 @@ public class VisaController : ControllerBase
         if (response is not null && !response.Ok)
         {
             _logger.LogError($"{threadIndex} - INTERNAL SERVER ERROR");
-            return new StatusCodeResult(500);
+            return StatusCode(500);
         }
 
         _logger.LogWarning($"{threadIndex} - FILLING UP INPUTS");
